@@ -1,4 +1,5 @@
-import schema from './schema';
+import Schema from './schema';
+import db from '../db/firebase';
 
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -9,8 +10,14 @@ let PORT = 8080;
 
 app.use(bodyParser.text({ type: 'application/graphql' }));
 
-app.post('/hello-world', (req, res) => {
-  graphql(schema, req.body).then((result) => {
+app.post('/users', (req, res) => {
+  graphql(Schema, req.body).then((result) => {
+    res.send(JSON.stringify(result, null, 2));
+  });
+});
+
+app.get('/connection', (req, res) => {
+  graphql(Schema, req.body, {db}).then((result) => {
     res.send(JSON.stringify(result, null, 2));
   });
 });

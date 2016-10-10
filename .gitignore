@@ -6,3 +6,6 @@ npm-debug.log
 
 # ignore .swp's
 *.swp
+
+# ignore credentials
+graphql-node-credentials.json
