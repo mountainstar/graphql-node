@@ -6,22 +6,38 @@ import {
   GraphQLString
 } from 'graphql';
 
-const User = new GraphQLObjectType({
-  name: 'User',
-  fields: () => ({
-    id: {
-      type: GraphQLID
+const db = {
+  Users: [
+    {
+      name: "Beyonce",
+      songs: ["Survivor", "Hold Up", "Freedom"]
     },
-    name: {
-      type: GraphQLString
+    {
+      name: "Kelly",
+      songs: ["Survivor", "Commander"]
     },
-    songs: {
-      type: new GraphQLList(Song)
+    {
+      name: "Michelle",
+      songs: ["Survivor"]
+    },
+  ],
+  Songs: [
+    {
+      name: "Survivor",
+      artists: ["Beyonce", "Kelly", "Michelle"]
+    },
+    {
+      name: "Commander",
+      artists: ["Kelly"]
+    },
+    {
+      name: "Pretty Hurts",
+      artists: ["Beyonce"]
     }
-  })
-});
+  ]
+}
 
-const Song = new GraphQLObjectType({
+const songType = new GraphQLObjectType({
   name: 'Song',
   fields: () => ({
     id: {
@@ -33,24 +49,67 @@ const Song = new GraphQLObjectType({
   })
 });
 
-const Query = new GraphQLObjectType({
-  name: 'Query',
+const userType = new GraphQLObjectType({
+  name: 'User',
   fields: () => ({
-    viewer: {
-      type: User,
-      resolve(parent, args, context) {
-        console.log(parent, args, context);
-        return {
-          id: '0',
-          name: 'Beyonce'
-        }
-      }
+    id: {
+      type: GraphQLID
+    },
+    name: {
+      type: GraphQLString
+    },
+    songs: {
+      type: new GraphQLList(songType)
     }
   })
 });
 
-let Schema = new GraphQLSchema({
-  query: Query
-});
+const findUserBy = (name) => {
+  return db.Users.filter((user) => {
+    return user.name === name;
+  })[0]
+}
 
-export default Schema;
+const findSongBy = (name) => {
+  return db.Songs.filter((song) => {
+    return song.name === name;
+  })[0]
+}
+
+let schema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: 'RootQueryType',
+    fields: () => ({
+      users: {
+        type: userType,
+        args: {
+          name: {
+            type: GraphQLString
+          },
+          id: {
+            type: GraphQLID
+          }
+        },
+        resolve(root, {name}) {
+          return findUserBy(name);
+        }
+      },
+      songs: {
+        type: songType,
+        args: {
+          name: {
+            type: GraphQLString
+          },
+          id: {
+            type: GraphQLID
+          }
+        },
+        resolve(root, {name}) {
+          return findSongBy(name);
+        }
+      }
+    })
+  })
+})
+
+export default schema;

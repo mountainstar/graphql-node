@@ -1,5 +1,4 @@
 import Schema from './schema';
-import db from '../db/firebase';
 
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -17,7 +16,7 @@ app.post('/users', (req, res) => {
 });
 
 app.get('/connection', (req, res) => {
-  graphql(Schema, req.body, {db}).then((result) => {
+  graphql(Schema, req.body).then((result) => {
     res.send(JSON.stringify(result, null, 2));
   });
 });
