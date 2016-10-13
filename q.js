@@ -56,3 +56,5 @@ query($login:String!) {
     }
   }
 }
+
+// curl -XPOST -H 'Content-Type:application/graphql' -d 'query Query { veggies(field: "color", value: "red") { id, name, color } }'  http://localhost:8080/graphql

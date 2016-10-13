@@ -6,108 +6,50 @@ import {
   GraphQLString
 } from 'graphql';
 
-const db = {
-  Users: [
-    {
-      name: "Beyonce",
-      songs: ["Survivor", "Hold Up", "Freedom"]
-    },
-    {
-      name: "Kelly",
-      songs: ["Survivor", "Commander"]
-    },
-    {
-      name: "Michelle",
-      songs: ["Survivor"]
-    },
-  ],
-  Songs: [
-    {
-      name: "Survivor",
-      artists: ["Beyonce", "Kelly", "Michelle"]
-    },
-    {
-      name: "Commander",
-      artists: ["Kelly"]
-    },
-    {
-      name: "Pretty Hurts",
-      artists: ["Beyonce"]
-    }
-  ]
-}
+import { db } from './data';
 
-const songType = new GraphQLObjectType({
-  name: 'Song',
+const veggieType = new GraphQLObjectType({
+  name: 'Veggie',
   fields: () => ({
-    id: {
-      type: GraphQLID
-    },
     name: {
       type: GraphQLString
+    },
+    color: {
+      type: GraphQLString
+    },
+    id: {
+      type: GraphQLID
     }
   })
 });
 
-const userType = new GraphQLObjectType({
-  name: 'User',
-  fields: () => ({
-    id: {
-      type: GraphQLID
-    },
-    name: {
-      type: GraphQLString
-    },
-    songs: {
-      type: new GraphQLList(songType)
+const findVeggieBy = (field, value) => {
+  return db.Veggies.filter((veggie) => {
+    if (veggie[field] === value) {
+      return veggie;
     }
-  })
-});
-
-const findUserBy = (name) => {
-  return db.Users.filter((user) => {
-    return user.name === name;
-  })[0]
-}
-
-const findSongBy = (name) => {
-  return db.Songs.filter((song) => {
-    return song.name === name;
   })[0]
 }
 
 let schema = new GraphQLSchema({
   query: new GraphQLObjectType({
-    name: 'RootQueryType',
+    name: 'Root',
     fields: () => ({
-      users: {
-        type: userType,
+      veggies: {
+        type: veggieType,
         args: {
-          name: {
+          field: {
             type: GraphQLString
           },
-          id: {
-            type: GraphQLID
+          value: {
+            type: GraphQLString
           }
         },
-        resolve(root, {name}) {
-          return findUserBy(name);
+        resolve(root, {field,value}) {
+          console.log('field,value:', field, value);
+          return findVeggieBy(field, value);
         }
       },
-      songs: {
-        type: songType,
-        args: {
-          name: {
-            type: GraphQLString
-          },
-          id: {
-            type: GraphQLID
-          }
-        },
-        resolve(root, {name}) {
-          return findSongBy(name);
-        }
-      }
     })
   })
 })
